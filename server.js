@@ -15,7 +15,15 @@ const sellerInquiryRoutes = require('./routes/sellerInquiryRoutes');
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: [
+        'https://gaadiwala-nextjs.vercel.app',
+        'https://indori-gaadiwala.vercel.app',
+        'http://localhost:3000',
+        'http://localhost:3001'
+    ],
+    credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -23,31 +31,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Connect to MongoDB
-if (!config.MONGODB_URI) {
-    console.error('❌ MONGODB_URI is missing in config!');
-    console.error('Please verify Railway Variables contain MONGODB_URI (or MONGO_URL / MONGODB_URL / DATABASE_URL)');
-    const mongoEnvKeys = Object.keys(process.env).filter((k) => /mongo|db|database/i.test(k));
-    console.error(`DEBUG: env keys containing mongo/db: ${mongoEnvKeys.join(', ') || '(none)'}`);
-    process.exit(1);
-}
-
-const startServer = async () => {
-    try {
-        await mongoose.connect(config.MONGODB_URI);
-        console.log('✅ MongoDB connected successfully');
-
-        // Start server
-        const PORT = config.PORT;
-        app.listen(PORT, () => {
-            console.log(`🚀 Server running on port ${PORT}`);
-            console.log(`📍 Environment: ${config.NODE_ENV}`);
-            console.log(`🌐 API URL: http://localhost:${PORT}`);
-        });
-    } catch (err) {
+mongoose.connect(config.MONGODB_URI)
+    .then(() => console.log('✅ MongoDB connected successfully'))
+    .catch(err => {
         console.error('❌ MongoDB connection error:', err);
         process.exit(1);
-    }
-};
+    });
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -55,6 +44,22 @@ app.use('/api/vehicles', vehicleRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/leads', leadRoutes);
 app.use('/api/seller-inquiries', sellerInquiryRoutes);
+
+// Root route for debugging
+app.get('/', (req, res) => {
+    res.json({
+        success: true,
+        message: 'Gaadiwala API is running',
+        endpoints: {
+            health: '/api/health',
+            vehicles: '/api/vehicles',
+            auth: '/api/auth',
+            bookings: '/api/bookings',
+            leads: '/api/leads',
+            sellerInquiries: '/api/seller-inquiries'
+        }
+    });
+});
 
 // Health check route
 app.get('/api/health', (req, res) => {
@@ -82,6 +87,12 @@ app.use((req, res) => {
     });
 });
 
-startServer();
+// Start server
+const PORT = config.PORT;
+app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`📍 Environment: ${config.NODE_ENV}`);
+    console.log(`🌐 API URL: http://localhost:${PORT}`);
+});
 
 module.exports = app;
