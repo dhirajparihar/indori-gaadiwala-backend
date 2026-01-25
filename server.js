@@ -19,10 +19,14 @@ app.use(cors({
     origin: [
         'https://gaadiwala-nextjs.vercel.app',
         'https://indori-gaadiwala.vercel.app',
+        'https://www.indorigaadiwala.com',
+        'https://api.indorigaadiwala.com',
         'http://localhost:3000',
         'http://localhost:3001'
     ],
-    credentials: true
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

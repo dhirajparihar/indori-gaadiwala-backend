@@ -120,6 +120,14 @@ router.post('/login',
                 { expiresIn: config.JWT_EXPIRE }
             );
 
+            // Set HTTP-only cookie with token
+            res.cookie('token', token, {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'none',
+                maxAge: 24 * 60 * 60 * 1000 // 24 hours
+            });
+
             res.json({
                 success: true,
                 message: 'Login successful',
