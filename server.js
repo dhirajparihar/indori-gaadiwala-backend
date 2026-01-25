@@ -23,12 +23,31 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Connect to MongoDB
-mongoose.connect(config.MONGODB_URI)
-    .then(() => console.log('✅ MongoDB connected successfully'))
-    .catch(err => {
+if (!config.MONGODB_URI) {
+    console.error('❌ MONGODB_URI is missing in config!');
+    console.error('Please verify Railway Variables contain MONGODB_URI (or MONGO_URL / MONGODB_URL / DATABASE_URL)');
+    const mongoEnvKeys = Object.keys(process.env).filter((k) => /mongo|db|database/i.test(k));
+    console.error(`DEBUG: env keys containing mongo/db: ${mongoEnvKeys.join(', ') || '(none)'}`);
+    process.exit(1);
+}
+
+const startServer = async () => {
+    try {
+        await mongoose.connect(config.MONGODB_URI);
+        console.log('✅ MongoDB connected successfully');
+
+        // Start server
+        const PORT = config.PORT;
+        app.listen(PORT, () => {
+            console.log(`🚀 Server running on port ${PORT}`);
+            console.log(`📍 Environment: ${config.NODE_ENV}`);
+            console.log(`🌐 API URL: http://localhost:${PORT}`);
+        });
+    } catch (err) {
         console.error('❌ MongoDB connection error:', err);
         process.exit(1);
-    });
+    }
+};
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -63,12 +82,6 @@ app.use((req, res) => {
     });
 });
 
-// Start server
-const PORT = config.PORT;
-app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`📍 Environment: ${config.NODE_ENV}`);
-    console.log(`🌐 API URL: http://localhost:${PORT}`);
-});
+startServer();
 
 module.exports = app;
