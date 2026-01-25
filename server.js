@@ -24,19 +24,17 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Connect to MongoDB
 console.log('----------------------------------------');
-console.log('DEBUG: Attempting configuration check...');
-console.log('DEBUG: PORT:', config.PORT);
-console.log('DEBUG: MONGODB_URI type:', typeof config.MONGODB_URI);
-console.log('DEBUG: MONGODB_URI value:', config.MONGODB_URI ? 'Defined (Length: ' + config.MONGODB_URI.length + ')' : 'UNDEFINED');
+console.log('DEBUG: Deep Variable Check');
+console.log('DEBUG: process.env.MONGODB_URI direct access:', process.env.MONGODB_URI ? 'Defined' : 'UNDEFINED');
+console.log('DEBUG: config.MONGODB_URI access:', config.MONGODB_URI ? 'Defined' : 'UNDEFINED');
+console.log('DEBUG: All Environment Keys:', Object.keys(process.env).sort().join(', '));
 console.log('----------------------------------------');
 
 if (!config.MONGODB_URI) {
-    console.error('❌ MONGODB_URI is missing in config!');
-    console.error('Please verify Railway Variables contain MONGODB_URI');
-    // process.exit(1); // Optional: Fail fast
+    console.error('❌ MONGODB_URI is still missing!');
 }
 
-mongoose.connect(config.MONGODB_URI)
+mongoose.connect(config.MONGODB_URI || process.env.MONGODB_URI)
     .then(() => console.log('✅ MongoDB connected successfully'))
     .catch(err => {
         console.error('❌ MongoDB connection error:', err);
