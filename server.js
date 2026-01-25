@@ -23,6 +23,19 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Connect to MongoDB
+console.log('----------------------------------------');
+console.log('DEBUG: Attempting configuration check...');
+console.log('DEBUG: PORT:', config.PORT);
+console.log('DEBUG: MONGODB_URI type:', typeof config.MONGODB_URI);
+console.log('DEBUG: MONGODB_URI value:', config.MONGODB_URI ? 'Defined (Length: ' + config.MONGODB_URI.length + ')' : 'UNDEFINED');
+console.log('----------------------------------------');
+
+if (!config.MONGODB_URI) {
+    console.error('❌ MONGODB_URI is missing in config!');
+    console.error('Please verify Railway Variables contain MONGODB_URI');
+    // process.exit(1); // Optional: Fail fast
+}
+
 mongoose.connect(config.MONGODB_URI)
     .then(() => console.log('✅ MongoDB connected successfully'))
     .catch(err => {
