@@ -20,6 +20,7 @@ app.use(cors({
         'https://gaadiwala-nextjs.vercel.app',
         'https://indori-gaadiwala.vercel.app',
         'https://www.indorigaadiwala.com',
+        'https://indorigaadiwala.com',
         'https://api.indorigaadiwala.com',
         'http://localhost:3000',
         'http://localhost:3001'
