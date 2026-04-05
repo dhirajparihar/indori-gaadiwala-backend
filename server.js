@@ -93,7 +93,7 @@ app.use((req, res) => {
 });
 
 // Start server
-const PORT = config.PORT;
+const PORT = config.PORT || 8080;
 app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
     console.log(`📍 Environment: ${config.NODE_ENV}`);
