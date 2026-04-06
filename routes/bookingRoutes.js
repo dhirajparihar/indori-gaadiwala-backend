@@ -11,7 +11,6 @@ router.post('/',
     [
         body('vehicle').notEmpty().withMessage('Vehicle ID is required'),
         body('customerName').notEmpty().withMessage('Name is required'),
-        body('customerEmail').isEmail().withMessage('Valid email is required'),
         body('customerPhone').notEmpty().withMessage('Phone number is required')
     ],
     async (req, res) => {
